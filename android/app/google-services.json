@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "909790490806",
+    "project_id": "exolearn-a9a0e",
+    "storage_bucket": "exolearn-a9a0e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:909790490806:android:3296d30f99648906463617",
+        "android_client_info": {
+          "package_name": "com.mvengi.mpremiere"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "909790490806-0eiiovrekm04fdvbbgpntr5stf07imib.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mvengi.mpremiere",
+            "certificate_hash": "96166395f28880e30a525c508aeaeae3d16b092a"
+          }
+        },
+        {
+          "client_id": "909790490806-ho9s5rfhm5e92rp1359n5nktnjs73qgi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAjZMuqln6XwwGwldvrQtXOXqrv1XKs-lI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "909790490806-ho9s5rfhm5e92rp1359n5nktnjs73qgi.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
