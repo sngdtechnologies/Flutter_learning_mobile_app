@@ -120,7 +120,7 @@ class _InfoCompteState extends State<InfoCompte> {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       image: DecorationImage(
-                        image: AssetImage('images/avatar/a1.jpg'),
+                        image: AssetImage('assets/img/img_not_available.jpeg'),
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -147,7 +147,7 @@ class _InfoCompteState extends State<InfoCompte> {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       image: DecorationImage(
-                        image: AssetImage('images/avatar/a1.jpg'),
+                        image: AssetImage('assets/img/img_not_available.jpeg'),
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -179,7 +179,7 @@ class _InfoCompteState extends State<InfoCompte> {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     image: DecorationImage(
-                      image: AssetImage('images/avatar/a1.jpg'),
+                      image: AssetImage('assets/img/img_not_available.jpeg'),
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -286,7 +286,7 @@ class _InfoCompteState extends State<InfoCompte> {
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
                                       image: DecorationImage(
-                                        image: AssetImage('images/avatar/a1.jpg'),
+                                        image: AssetImage('assets/img/img_not_available.jpeg'),
                                         fit: BoxFit.cover,
                                       ),
                                     ),

@@ -87,6 +87,28 @@ class DatabaseService {
     return Stream.value(listUser);
   }
 
+  List<Map<String, dynamic>> getListMessage() { //                        <--- Stream
+    // return Stream<String>.value('Coucou');
+    List<Map<String, dynamic>> listUser = [];
+    Map<String, dynamic> _appUserData;
+    
+    _firebaseFirestore.collection("utilisateurs").get().then((querySnapshot) {
+      querySnapshot.docs.forEach((result) {
+        _appUserData = {
+          'uid': result.id,
+          'nom': result.data()["nom"],
+          'profil': result.data()["profil"],
+          'recentMsg': messageService.getLastMessage(result.data()["uid"])['lastMessage'],
+          'unRead': messageService.getUnRead(result.data()["uid"]),
+          'timestamp': messageService.getLastMessage(result.data()["uid"])['timestamp'],
+        };
+        listUser.add(_appUserData);
+      });
+    });
+
+    return listUser;
+  }
+
   List<Map<String, dynamic>> connection() {
     List<Map<String, dynamic>> listUser = [];
     Map<String, dynamic> _appUserData;

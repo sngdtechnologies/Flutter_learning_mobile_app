@@ -1,5 +1,6 @@
 // ignore_for_file: file_names
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:premiere/constants/ArgonColors.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -45,25 +46,36 @@ class CardListChat extends StatelessWidget {
                   GestureDetector(
                     onTap: tap,
                     child: Container(
-                      width: MediaQuery.of(context).size.width * 0.15,
-                      height: MediaQuery.of(context).size.height * 0.10,
-                      child: CachedNetworkImage(
-                        imageUrl: picture,
-                          progressIndicatorBuilder: (context, url, downloadProgress) => 
-                                  CircularProgressIndicator(value: downloadProgress.progress),
-                          errorWidget: (context, url, error) => Container(
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  image: DecorationImage(
-                                    image: AssetImage('assets/img/img_not_available.jpeg'),
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                                clipBehavior: Clip.hardEdge,
-                              ),
-                      ),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
+                      ),
+                      child: CachedNetworkImage(
+                        width: MediaQuery.of(context).size.width * 0.15,
+                        height: MediaQuery.of(context).size.height * 0.10,
+                        fit: BoxFit.cover,
+                        imageUrl: picture,
+                        progressIndicatorBuilder: (context, url, downloadProgress) => 
+                          SpinKitWave(
+                            color: Colors.white,
+                            size: 20,
+                            itemBuilder: (context, int index) {
+                              return DecoratedBox(
+                                decoration: BoxDecoration(
+                                  color: index.isEven ? Colors.red : Colors.green,
+                                ),
+                              );
+                            },
+                          ),
+                        errorWidget: (context, url, error) => Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            image: DecorationImage(
+                              image: AssetImage('assets/img/img_not_available.jpeg'),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          clipBehavior: Clip.hardEdge,
+                        ),
                       ),
                     ),
                   ),

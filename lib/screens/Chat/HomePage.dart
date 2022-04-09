@@ -1,4 +1,6 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:premiere/services/authentication.dart';
 import 'package:premiere/services/database.dart';
 import 'package:premiere/widgets/card-list-chat.dart';
@@ -36,8 +38,8 @@ class _HomePageState extends State<HomePage> {
   String _query = "";
   var _searchview = new TextEditingController();
 
-  List<ListMessage> _listMessage;
-  List<ListMessage> _filterListMessage;
+  List<Map<String, dynamic>> _listMessage;
+  List<Map<String, dynamic>> _filterListMessage;
 
   _HomePageState() {
     _searchview.addListener(() {
@@ -60,7 +62,6 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    _listmessage();
   }
 
   @override
@@ -121,32 +122,25 @@ class _HomePageState extends State<HomePage> {
         children: [
           FavoriteSection(),
           Expanded(
-            child: _firstSearch ? buildListUsers(context) : _performSearch(),
+            child: _firstSearch ? buildListUsers(context) : _performSearch(context),
           )
         ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-        backgroundColor: dBlue,
-        child: const Icon(
-          Icons.edit,
-          size: 20,
-        ),
       ),
     );
   }
 
   //Perform actual search
-  Widget _performSearch() {
-    _filterListMessage = new List<ListMessage>();
+  Widget _performSearch(BuildContext context) {
+    _filterListMessage = new List<Map<String, dynamic>>();
+    _listMessage = Provider.of<List<Map<String, dynamic>>>(context, listen: true);
     for (int i = 0; i < _listMessage.length; i++) {
       var item = _listMessage[i];
 
-      if (item.senderName.toLowerCase().contains(_query.toLowerCase())) {
+      if (item["nom"].toLowerCase().contains(_query.toLowerCase())) {
         _filterListMessage.add(item);
       }
     }
-    return _createFilteredListView();
+    return _createFilteredListView(context, _filterListMessage);
   }
 
   //Create the list for all
@@ -156,58 +150,11 @@ class _HomePageState extends State<HomePage> {
 
     final _users = Provider.of<List<Map<String, dynamic>>>(context, listen: true);
     // if (_users.length == 0) throw Exception("Aucun utilisateur");
-
-    // return StreamBuilder<List<AppUserData>>(
-    //   stream: DatabaseService().getStreamOfMyModel(),
-    //   builder: (BuildContext context, snapshot) {
-    //     if (!snapshot.hasData) {
-    //       return Text('Aucun utilisateur');
-    //     } else {
-    //       var _users = snapshot.data;
-    //       return ListView.builder(
-    //         itemCount:_users.length,
-    //         itemBuilder: (context, index) {
-    //           DatabaseService().getStreamOfMyModel().forEach((element) {print(element);});
-    //           // return CardListChat(
-    //           //   etat: 0,
-    //           //   unRead: _users[index].unRead,
-    //           //   name: _users[index].nom,
-    //           //   picture: _users[index].profil,
-    //           //   recent_msg: _users[index].recentMsg,
-    //           //   tap: () => showDialog(
-    //           //     context: context,
-    //           //     builder: (context) => Semantics(
-    //           //       child: CircleAvatar(
-    //           //         // radius: 20.0,
-    //           //         backgroundImage: AssetImage(_users[index].profil),
-    //           //       ),
-    //           //     ),
-    //           //   ),
-    //           //   onMessage: (){
-    //           //     if (currentUser.uid == _users[index].uid) return;
-    //           //     Navigator.push(
-    //           //       context,
-    //           //       MaterialPageRoute(builder: (BuildContext context) {
-    //           //         // return ChatScreen(
-    //           //         //   image: picture,
-    //           //         //   text: name,
-    //           //         // );
-    //           //         // return ChatPage(chatParams: ChatParams('1', '2'));
-    //           //         return ChatPage(chatParams: ChatParams(currentUser.uid, _users[index].uid));
-    //           //       }),
-    //           //     );
-    //           //   },
-    //           // );
-    //         }
-    //       );
-    //     }
-    //   },
-    // );
     return ListView.builder(
       itemCount:_users.length,
       itemBuilder: (context, index) {
         // DatabaseService().getStreamOfMyModel().forEach((element) {print(element);});
-        print(currentUser.uid + ' ' + _users[index]["uid"]);
+        // print(currentUser.uid + ' ' + _users[index]["uid"]);
         if(currentUser.uid == _users[index]["uid"]) return Container();
         // if(currentUser.uid != _users[index]["uid"]) {
           return CardListChat(
@@ -264,93 +211,75 @@ class _HomePageState extends State<HomePage> {
   }
 
   //Create the Filtered ListView
-  ListView _createFilteredListView() {
+  Widget _createFilteredListView(BuildContext context, List<Map<String, dynamic>> _filterUser) {
+    final currentUser = Provider.of<AppUser>(context, listen: true);
     return ListView.builder(
-        padding: const EdgeInsets.all(4.0),
-        itemCount: _filterListMessage.length,
-        itemBuilder: (context, index) {
-          var item = _filterListMessage[index];
-
-          return Container(
-            alignment: Alignment.topRight,
-            child: CardListChat(
-              picture: item.senderProfile,
-              name: item.senderName,
-              recent_msg: item.message,
-              etat: item.etat,
-              unRead: item.unRead,
-              date: item.date,
-              tap: () => showDialog(
-                context: context,
-                builder: (context) => Semantics(
-                  child: CircleAvatar(
-                    // radius: 20.0,
-                    backgroundImage: AssetImage(item.senderProfile),
+      itemCount:_filterUser.length,
+      itemBuilder: (context, index) {
+        // DatabaseService().getStreamOfMyModel().forEach((element) {print(element);});
+        // print(currentUser.uid + ' ' + _users[index]["uid"]);
+        if(currentUser.uid == _filterUser[index]["uid"]) return Container();
+        // if(currentUser.uid != _users[index]["uid"]) {
+          return CardListChat(
+            etat: 4,
+            unRead: _filterUser[index]["unRead"],
+            name: _filterUser[index]["nom"],
+            picture: _filterUser[index]["profil"],
+            recent_msg: _filterUser[index]["recentMsg"],
+            date: _filterUser[index]["timestamp"],
+            tap: () => showDialog(
+              context: context,
+              builder: (context) => Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                ),
+                child: CachedNetworkImage(
+                  fit: BoxFit.cover,
+                  imageUrl: _filterUser[index]["profil"],
+                  progressIndicatorBuilder: (context, url, downloadProgress) => 
+                    SpinKitWave(
+                      color: Colors.white,
+                      size: 20,
+                      itemBuilder: (context, int index) {
+                        return DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: index.isEven ? Colors.red : Colors.green,
+                          ),
+                        );
+                      },
+                    ),
+                  errorWidget: (context, url, error) => Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      image: DecorationImage(
+                        image: AssetImage('assets/img/img_not_available.jpeg'),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    clipBehavior: Clip.hardEdge,
                   ),
                 ),
-              ),
+              )
             ),
+            onMessage: (){
+              if (currentUser.uid == _filterUser[index]["uid"]) return;
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (BuildContext context) {
+                  // return ChatScreen(
+                  //   image: picture,
+                  //   text: name,
+                  // );
+                  // return ChatPage(chatParams: ChatParams('1', '2'));
+                  return ChatPage(chatParams: ChatParams(currentUser.uid, _filterUser[index]["uid"]));
+                }),
+              );
+            },
           );
-        });
+        // }
+      }
+    );
   }
-
-  void _listmessage() {
-    var list = <ListMessage>[
-      ListMessage(
-        senderProfile: 'images/avatar/a2.jpg',
-        senderName: 'Lara',
-        message: 'Hello! how are you toutou tou tou tou tou',
-        unRead: 0,
-        etat: 0,
-        date: '16:35',
-      ),
-      ListMessage(
-        senderProfile: 'images/avatar/a3.jpg',
-        senderName: 'Kolya',
-        message: 'Will you visit me',
-        unRead: 1,
-        etat: 1,
-        date: '16:03',
-      ),
-      ListMessage(
-        senderProfile: 'images/avatar/a4.jpg',
-        senderName: 'Mary',
-        message: 'I ate your mom',
-        unRead: 6,
-        etat: 2,
-        date: '15:16',
-      ),
-      ListMessage(
-        senderProfile: 'images/avatar/a5.jpg',
-        senderName: 'Louren',
-        message: 'Are you with Kolya again?',
-        unRead: 0,
-        etat: 3,
-        date: '13:58',
-      ),
-      ListMessage(
-        senderProfile: 'images/avatar/a6.jpg',
-        senderName: 'Helen',
-        message: 'Borrow money please',
-        unRead: 5,
-        etat: 4,
-        date: '10:42',
-      ),
-      ListMessage(
-        senderProfile: 'images/avatar/a7.jpg',
-        senderName: 'Stive',
-        message: 'Hello! how are you',
-        unRead: 2,
-        etat: 0,
-        date: '09:30',
-      ),
-    ];
-
-    setState(() {
-      _listMessage = list;
-    });
-  }
-
 }
 
 class FavoriteSection extends StatelessWidget {
