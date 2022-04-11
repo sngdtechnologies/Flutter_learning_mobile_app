@@ -457,6 +457,9 @@ class _ChatPageState extends State<ChatPage> {
                   Expanded(
                     child: TextField(
                       onSubmitted: (value) {
+                        setState(() {
+                          line = 1;
+                        });
                         onSendMessage(textEditingController.text, 0);
                       },
                       style: TextStyle(color: Colors.blueGrey, fontSize: 15.0),
@@ -466,7 +469,7 @@ class _ChatPageState extends State<ChatPage> {
                       // minLines: null,
                       cursorWidth: 3.0,
                       decoration: InputDecoration.collapsed(
-                        hintText: 'Ecrivez votre message avec panache et sans discorde...',
+                        hintText: 'Ecrivez votre message...',
                         hintStyle: TextStyle(color: Colors.grey),
                       ),
                       onChanged: (value) {

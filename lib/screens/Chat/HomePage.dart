@@ -1,8 +1,12 @@
+import 'dart:async';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:premiere/screens/Loading.dart';
 import 'package:premiere/services/authentication.dart';
 import 'package:premiere/services/database.dart';
+import 'package:premiere/services/message_database.dart';
 import 'package:premiere/widgets/card-list-chat.dart';
 // import 'MessageSection.dart';
 import 'package:premiere/widgets/drawer.dart';
@@ -40,6 +44,11 @@ class _HomePageState extends State<HomePage> {
 
   List<Map<String, dynamic>> _listMessage;
   List<Map<String, dynamic>> _filterListMessage;
+
+  Map<String, dynamic> lastMessage;
+  int unRead = 0;
+  int _start = 4;
+  var isLoading = false;
 
   _HomePageState() {
     _searchview.addListener(() {
@@ -121,12 +130,41 @@ class _HomePageState extends State<HomePage> {
       body: Column(
         children: [
           FavoriteSection(),
-          Expanded(
-            child: _firstSearch ? buildListUsers(context) : _performSearch(context),
-          )
+          isLoading == true
+          ? Loading()
+          : Expanded(
+              child: _firstSearch ? buildListUsers(context) : _performSearch(context),
+            )
         ],
       ),
     );
+  }
+
+  getLastMessage(String peer) async {
+    String groupChatId = ChatParams(FirebaseAuth.instance.currentUser.uid, peer).getChatGroupId();
+    FirebaseFirestore.instance
+        .collection('messages')
+        .doc(groupChatId)
+        .collection(groupChatId).get().then((querySnapshot) {
+              setState(() {
+                lastMessage = querySnapshot.docs.last.data();
+              });
+        });
+  }
+
+  getUnRead(String peer) async {
+    String groupChatId = ChatParams(FirebaseAuth.instance.currentUser.uid, peer).getChatGroupId();
+    FirebaseFirestore.instance
+        .collection('messages')
+        .doc(groupChatId)
+        .collection(groupChatId)
+        .where('read', isEqualTo: false)
+        .get()
+        .then((value) => 
+          setState(() {
+            unRead = value.size;
+          })
+        );
   }
 
   //Perform actual search
@@ -153,45 +191,82 @@ class _HomePageState extends State<HomePage> {
     return ListView.builder(
       itemCount:_users.length,
       itemBuilder: (context, index) {
-        // DatabaseService().getStreamOfMyModel().forEach((element) {print(element);});
         // print(currentUser.uid + ' ' + _users[index]["uid"]);
-        if(currentUser.uid == _users[index]["uid"]) return Container();
-        // if(currentUser.uid != _users[index]["uid"]) {
+        // print(_users[index]["lastMessage"]["content"]);
+        var peer = _users[index]["uid"];
+        var user = currentUser.uid;
+        if(user == peer) return Container();
+        var item = _users[index];
+        
+        getLastMessage(peer);
+        getUnRead(peer);
+
+        Map<String, dynamic> lastM = lastMessage;
+
+        // const oneDecimal = const Duration(seconds: 1);
+        // Timer _timer = new Timer.periodic(
+        //     oneDecimal,
+        //     (Timer timer) => setState(() {
+        //           if (_start < 1) {
+        //             timer.cancel();
+        //           } else {
+        //             _start = _start - 1;
+        //           }
+        //         }));
+        // print(lastMessage["content"]);
+        if(currentUser.uid != peer) {
+          if(_users.length == index)
+            setState(() {
+              isLoading = false;
+            });
+          
           return CardListChat(
             etat: 4,
-            unRead: _users[index]["unRead"],
-            name: _users[index]["nom"],
-            picture: _users[index]["profil"],
-            recent_msg: _users[index]["recentMsg"],
-            date: _users[index]["timestamp"],
+            unRead: unRead,
+            name: item["nom"],
+            picture: item["profil"],
+            recent_msg: lastM["content"],    
+            date: lastM["timestamp"],
+            type: lastM["type"],
             tap: () => showDialog(
               context: context,
-              builder: (context) => Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  image: DecorationImage(
-                    image: NetworkImage(
-                      _users[index]["profil"]
-                    ),
+              builder: (context) => Scaffold(
+                appBar: AppBar(
+                  backgroundColor: Colors.black,
+                  leading: IconButton(
+                    icon: Icon(Icons.arrow_back, color: Colors.white, size: 24.0),
+                    onPressed: () => Navigator.pop(context)),
+                ),
+                body: Container(
+                  child: CachedNetworkImage(
                     fit: BoxFit.cover,
-                    onError: (dynamic, stackTrace) {
-                      return Container(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          image: DecorationImage(
-                            image: AssetImage('images/avatar/a1.jpg'),
-                            fit: BoxFit.cover,
-                          ),
+                    imageUrl: item['profil'],
+                    progressIndicatorBuilder: (context, url, downloadProgress) => 
+                            SpinKitWave(
+                              color: Colors.white,
+                              size: 20,
+                            ),
+                    errorWidget: (context, url, error) => Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        image: DecorationImage(
+                          image: AssetImage('assets/img/img_not_available.jpeg'),
+                          fit: BoxFit.cover,
                         ),
-                        clipBehavior: Clip.hardEdge,
-                      );
-                    },
+                      ),
+                      clipBehavior: Clip.hardEdge,
+                    ),
                   ),
                 ),
-              )
+              ),
             ),
             onMessage: (){
-              if (currentUser.uid == _users[index]["uid"]) return;
+              if (user == peer) return;
+              // Navigator.pushNamed(
+              //   context,
+              //   '/chat',
+              //   arguments: ChatParams(user, peer),
+              // );
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (BuildContext context) {
@@ -200,12 +275,12 @@ class _HomePageState extends State<HomePage> {
                   //   text: name,
                   // );
                   // return ChatPage(chatParams: ChatParams('1', '2'));
-                  return ChatPage(chatParams: ChatParams(currentUser.uid, _users[index]["uid"]));
+                  return ChatPage(chatParams: ChatParams(user, peer));
                 }),
               );
             },
           );
-        // }
+        }
       }
     );
   }
@@ -216,53 +291,77 @@ class _HomePageState extends State<HomePage> {
     return ListView.builder(
       itemCount:_filterUser.length,
       itemBuilder: (context, index) {
-        // DatabaseService().getStreamOfMyModel().forEach((element) {print(element);});
         // print(currentUser.uid + ' ' + _users[index]["uid"]);
-        if(currentUser.uid == _filterUser[index]["uid"]) return Container();
-        // if(currentUser.uid != _users[index]["uid"]) {
+        // print(_users[index]["lastMessage"]["content"]);
+        var peer = _filterListMessage[index]["uid"];
+        var user = currentUser.uid;
+        if(user == peer) return Container();
+        var item = _filterListMessage[index];
+        
+        getLastMessage(peer);
+        getUnRead(peer);
+
+        Map<String, dynamic> lastM = lastMessage;
+
+        const oneDecimal = const Duration(seconds: 1);
+        Timer _timer = new Timer.periodic(
+            oneDecimal,
+            (Timer timer) => setState(() {
+                  if (_start < 1) {
+                    timer.cancel();
+                  } else {
+                    _start = _start - 1;
+                  }
+                }));
+        // print(lastMessage["content"]);
+        if(currentUser.uid != peer && lastM != null) {
           return CardListChat(
             etat: 4,
-            unRead: _filterUser[index]["unRead"],
-            name: _filterUser[index]["nom"],
-            picture: _filterUser[index]["profil"],
-            recent_msg: _filterUser[index]["recentMsg"],
-            date: _filterUser[index]["timestamp"],
+            unRead: unRead,
+            name: item["nom"],
+            picture: item["profil"],
+            recent_msg: _start < 1 ? lastM["content"] : '',    
+            date: _start < 1 ? lastM["timestamp"] : null,
+            type: _start < 1 ? lastM["type"] : null,
             tap: () => showDialog(
               context: context,
-              builder: (context) => Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
+              builder: (context) => Scaffold(
+                appBar: AppBar(
+                  backgroundColor: Colors.black,
+                  leading: IconButton(
+                    icon: Icon(Icons.arrow_back, color: Colors.white, size: 24.0),
+                    onPressed: () => Navigator.pop(context)),
                 ),
-                child: CachedNetworkImage(
-                  fit: BoxFit.cover,
-                  imageUrl: _filterUser[index]["profil"],
-                  progressIndicatorBuilder: (context, url, downloadProgress) => 
-                    SpinKitWave(
-                      color: Colors.white,
-                      size: 20,
-                      itemBuilder: (context, int index) {
-                        return DecoratedBox(
-                          decoration: BoxDecoration(
-                            color: index.isEven ? Colors.red : Colors.green,
-                          ),
-                        );
-                      },
-                    ),
-                  errorWidget: (context, url, error) => Container(
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      image: DecorationImage(
-                        image: AssetImage('assets/img/img_not_available.jpeg'),
-                        fit: BoxFit.cover,
+                body: Container(
+                  child: CachedNetworkImage(
+                    fit: BoxFit.cover,
+                    imageUrl: item['profil'],
+                    progressIndicatorBuilder: (context, url, downloadProgress) => 
+                            SpinKitWave(
+                              color: Colors.white,
+                              size: 20,
+                            ),
+                    errorWidget: (context, url, error) => Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        image: DecorationImage(
+                          image: AssetImage('assets/img/img_not_available.jpeg'),
+                          fit: BoxFit.cover,
+                        ),
                       ),
+                      clipBehavior: Clip.hardEdge,
                     ),
-                    clipBehavior: Clip.hardEdge,
                   ),
                 ),
-              )
+              ),
             ),
             onMessage: (){
-              if (currentUser.uid == _filterUser[index]["uid"]) return;
+              if (user == peer) return;
+              // Navigator.pushNamed(
+              //   context,
+              //   '/chat',
+              //   arguments: ChatParams(user, peer),
+              // );
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (BuildContext context) {
@@ -271,12 +370,12 @@ class _HomePageState extends State<HomePage> {
                   //   text: name,
                   // );
                   // return ChatPage(chatParams: ChatParams('1', '2'));
-                  return ChatPage(chatParams: ChatParams(currentUser.uid, _filterUser[index]["uid"]));
+                  return ChatPage(chatParams: ChatParams(user, peer));
                 }),
               );
             },
           );
-        // }
+        }
       }
     );
   }

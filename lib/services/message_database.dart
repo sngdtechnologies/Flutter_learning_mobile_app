@@ -57,24 +57,17 @@ class MessageDatabaseService {
   }
 
   Map<String, dynamic> getLastMessage(String peer) {
-    String lastMessage = '', timestamp = '', uid = '';
+    var lastMessage;
+    // print(FirebaseAuth.instance.currentUser.uid);
     String groupChatId = ChatParams(FirebaseAuth.instance.currentUser.uid, peer).getChatGroupId();
     FirebaseFirestore.instance
         .collection('messages')
         .doc(groupChatId)
-        .collection(groupChatId).snapshots().last.asStream().map((snapshot) => 
-          snapshot.docs.map((doc) {
-            uid = doc.get('uid') ?? '';
-            lastMessage = doc.get('content') ?? '';
-            timestamp = doc.get('timestamp') ?? '';
-          })  
-        );
+        .collection(groupChatId).get().then((querySnapshot) {
+              lastMessage = querySnapshot.docs.last.data();
+        });
         // print(lastMessage);
-    return {
-      'uid': uid,
-      'lastMessage': lastMessage,
-      'timestamp': timestamp,
-    };
+    return lastMessage;
   }
 
   int getUnRead(String peer) {

@@ -130,6 +130,18 @@ class ArgonDrawer extends StatelessWidget {
                           MaterialPageRoute(builder: (BuildContext context) {
                         return HomePage();
                       }));
+                      // return PageRouteBuilder(
+                      //   pageBuilder: (context, animation, secondaryAnimation) =>
+                      //       HomePage(),
+                      //   transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                      //     animation = CurvedAnimation(curve: Curves.ease, parent: animation);
+                      //     return FadeTransition(
+                      //       opacity: animation,
+                      //       child: child,
+                      //     );
+                      //   }
+                      // );
+                      // Navigator.pushNamed(context, '/chat');
                     }
                   },
                   iconColor: Colors.deepPurple,

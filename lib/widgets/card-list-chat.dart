@@ -13,8 +13,9 @@ class CardListChat extends StatelessWidget {
     this.name = 'Adelaide',
     this.recent_msg = 'Je me suis limité à la partie',
     this.etat = 0,
-    this.date = '05/12/2021',
+    this.date,
     this.unRead = 0,
+    this.type,
     this.tap = defaultFunc,
     this.onMessage = defaultFunc,
   });
@@ -25,6 +26,7 @@ class CardListChat extends StatelessWidget {
   final int etat;
   final String date;
   final int unRead;
+  final int type;
   final tap;
   final onMessage;
 
@@ -32,6 +34,7 @@ class CardListChat extends StatelessWidget {
     print("the function works!");
   }
 
+  // String mes = 'effectivement je suis entrainn';
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -45,10 +48,11 @@ class CardListChat extends StatelessWidget {
                 children: [
                   GestureDetector(
                     onTap: tap,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                      ),
+                    child: Material(
+                      color: Colors.white,
+                      // type: MaterialType.circle,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(20.0))),
                       child: CachedNetworkImage(
                         width: MediaQuery.of(context).size.width * 0.15,
                         height: MediaQuery.of(context).size.height * 0.10,
@@ -58,13 +62,6 @@ class CardListChat extends StatelessWidget {
                           SpinKitWave(
                             color: Colors.white,
                             size: 20,
-                            itemBuilder: (context, int index) {
-                              return DecoratedBox(
-                                decoration: BoxDecoration(
-                                  color: index.isEven ? Colors.red : Colors.green,
-                                ),
-                              );
-                            },
                           ),
                         errorWidget: (context, url, error) => Container(
                           decoration: BoxDecoration(
@@ -97,16 +94,18 @@ class CardListChat extends StatelessWidget {
                                     fontSize: 15,
                                   ),
                                 ),
-                                Text(
-                                  date != ''
-                                  ? DateFormat('dd MMM kk:mm')
-                                            .format(DateTime.fromMillisecondsSinceEpoch(int.parse(date)))
-                                  : '',
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                )
+                                date != null
+                                ? Text(
+                                    date != ''
+                                    ? DateFormat('yyyy-mm-dd kk:mm')
+                                              .format(DateTime.fromMillisecondsSinceEpoch(int.parse(date)))
+                                    : '',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  )
+                                : Container(),
                               ],
                             ),
                           ),
@@ -116,35 +115,59 @@ class CardListChat extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                if (etat != 4)
-                                  Icon(
-                                    (etat == 0)
-                                        ? Icons.watch
-                                        : (etat == 1)
-                                            ? Icons.messenger_outline
-                                            : (etat == 2)
-                                                ? Icons.messenger_sharp
-                                                : (etat == 3)
-                                                    ? Icons.message
-                                                    : null,
-                                    color: Colors.blue,
-                                    size: 15,
-                                  ),
-                                Flexible(
-                                  child: RichText(
-                                    text: TextSpan(
-                                      text: recent_msg != '' ? recent_msg : 'Aucun message',
-                                      style: TextStyle(
-                                        color: Colors.black,
+                                Material(
+                                  child: Row(
+                                    children: [
+                                      if (etat != 4)
+                                        Icon(
+                                          (etat == 0)
+                                              ? Icons.watch
+                                              : (etat == 1)
+                                                  ? Icons.messenger_outline
+                                                  : (etat == 2)
+                                                      ? Icons.messenger_sharp
+                                                      : (etat == 3)
+                                                          ? Icons.message
+                                                          : null,
+                                          color: Colors.blue,
+                                          size: 15,
+                                        ),
+                                      Icon(
+                                        (unRead != 0)
+                                          ? Icons.mark_chat_unread
+                                          : Icons.mark_chat_read,
+                                        color: Colors.blue,
+                                        size: 20,
                                       ),
-                                    ),
-                                    maxLines: 1,
+                                      type != null
+                                      ? type == 0
+                                        ? Material(
+                                          child: Text(
+                                            recent_msg != '' 
+                                            ? recent_msg.length >= 31
+                                              ? recent_msg.substring(0, 30) + '...' : recent_msg
+                                            : 'Aucun message',
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                            ),
+                                          ),
+                                        )
+                                        : Material(
+                                            child: Row(
+                                              children: [
+                                                Icon(Icons.mic_sharp),
+                                                Text('Audio'),
+                                              ]
+                                            ),
+                                          )
+                                      : Container(),
+                                    ],
                                   ),
                                 ),
                                 unRead != 0
                                     ? Container(
-                                        padding: const EdgeInsets.all(5),
-                                        decoration: const BoxDecoration(
+                                        padding: EdgeInsets.all(5),
+                                        decoration: BoxDecoration(
                                           color: Colors.green,
                                           shape: BoxShape.circle,
                                         ),

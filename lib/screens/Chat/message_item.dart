@@ -54,13 +54,6 @@ class MessageItem extends StatelessWidget {
                         SpinKitWave(
                           color: Colors.white,
                           size: 20,
-                          itemBuilder: (context, int index) {
-                            return DecoratedBox(
-                              decoration: BoxDecoration(
-                                color: index.isEven ? Colors.red : Colors.green,
-                              ),
-                            );
-                          },
                         ),
                       errorWidget: (context, url, error) => Container(
                         decoration: BoxDecoration(
@@ -187,7 +180,10 @@ class MessageItem extends StatelessWidget {
               fit: BoxFit.cover,
               imageUrl: message.content,
               progressIndicatorBuilder: (context, url, downloadProgress) => 
-                      CircularProgressIndicator(value: downloadProgress.progress),
+                      SpinKitWave(
+                        color: Colors.white,
+                        size: 20,
+                      ),
               errorWidget: (context, url, error) => Container(
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,

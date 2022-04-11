@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:premiere/models/user.dart';
 import 'package:premiere/services/message_database.dart';
@@ -72,13 +73,13 @@ class DatabaseService {
     
     _firebaseFirestore.collection("utilisateurs").get().then((querySnapshot) {
       querySnapshot.docs.forEach((result) {
+        print(messageService.getLastMessage(result.id));
         _appUserData = {
           'uid': result.id,
           'nom': result.data()["nom"],
           'profil': result.data()["profil"],
-          'recentMsg': messageService.getLastMessage(result.data()["uid"])['lastMessage'],
-          'unRead': messageService.getUnRead(result.data()["uid"]),
-          'timestamp': messageService.getLastMessage(result.data()["uid"])['timestamp'],
+          'lastMessage': messageService.getLastMessage(result.id),
+          'unRead': messageService.getUnRead(result.id),
         };
         listUser.add(_appUserData);
       });
@@ -87,26 +88,24 @@ class DatabaseService {
     return Stream.value(listUser);
   }
 
-  List<Map<String, dynamic>> getListMessage() { //                        <--- Stream
+  Stream<List<Map<String, dynamic>>> getListMessage() { //                        <--- Stream
     // return Stream<String>.value('Coucou');
     List<Map<String, dynamic>> listUser = [];
     Map<String, dynamic> _appUserData;
     
     _firebaseFirestore.collection("utilisateurs").get().then((querySnapshot) {
       querySnapshot.docs.forEach((result) {
+        print(result.id);
         _appUserData = {
           'uid': result.id,
           'nom': result.data()["nom"],
           'profil': result.data()["profil"],
-          'recentMsg': messageService.getLastMessage(result.data()["uid"])['lastMessage'],
-          'unRead': messageService.getUnRead(result.data()["uid"]),
-          'timestamp': messageService.getLastMessage(result.data()["uid"])['timestamp'],
         };
         listUser.add(_appUserData);
       });
     });
 
-    return listUser;
+    return Stream.value(listUser);
   }
 
   List<Map<String, dynamic>> connection() {
