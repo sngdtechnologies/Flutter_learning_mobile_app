@@ -1,6 +1,8 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:premiere/constants/ArgonColors.dart';
 import 'package:flutter/material.dart';
 import 'package:premiere/screens/Accueil.dart';
@@ -69,8 +71,8 @@ class _NavbarState extends State<Navbar> {
           ],
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.only(
-              bottomRight: Radius.circular(60),
-              bottomLeft: Radius.circular(60),
+              bottomRight: Radius.circular(50),
+              bottomLeft: Radius.circular(50),
             ),
           ),
         ),

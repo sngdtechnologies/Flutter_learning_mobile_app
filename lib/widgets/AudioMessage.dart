@@ -69,10 +69,10 @@ class _AudioMessageState extends State<AudioMessage> {
         alignment: Alignment.centerLeft,
         margin: widget.userId != widget.message.idFrom
             ? const EdgeInsets.only(
-                right: 25,
+                right: 35,
               )
             : const EdgeInsets.only(
-                left: 20,
+                left: 30,
               ),
         decoration: widget.userId != widget.message.idFrom
             ? const BoxDecoration(

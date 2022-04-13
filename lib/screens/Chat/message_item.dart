@@ -42,30 +42,56 @@ class MessageItem extends StatelessWidget {
                     : MainAxisAlignment.end,
                 children: [
                   Container(
-                    decoration: BoxDecoration(
+                    padding: const EdgeInsets.all(5.0),
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
                       shape: BoxShape.circle,
                     ),
-                    child: CachedNetworkImage(
-                      width: 60,
-                      height: 50,
-                      fit: BoxFit.cover,
-                      imageUrl: userId == message.idFrom ? profilUser : profilPeer,
-                      progressIndicatorBuilder: (context, url, downloadProgress) => 
-                        SpinKitWave(
-                          color: Colors.white,
-                          size: 20,
-                        ),
-                      errorWidget: (context, url, error) => Container(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          image: DecorationImage(
-                            image: AssetImage('assets/img/img_not_available.jpeg'),
-                            fit: BoxFit.cover,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.all(Radius.circular(25)),
+                      child: CachedNetworkImage(
+                        width: MediaQuery.of(context).size.width * 0.17,
+                        height: MediaQuery.of(context).size.height * 0.1,
+                        fit: BoxFit.cover,
+                        imageUrl: userId == message.idFrom ? profilUser : profilPeer,
+                        progressIndicatorBuilder: (context, url, downloadProgress) => 
+                          SpinKitWave(
+                            color: Colors.white,
+                            size: 15,
                           ),
+                        errorWidget: (context, url, error) => Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            image: DecorationImage(
+                              image: AssetImage('assets/img/img_not_available.jpeg'),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          clipBehavior: Clip.hardEdge,
                         ),
-                        clipBehavior: Clip.hardEdge,
                       ),
                     ),
+                    // child: CachedNetworkImage(
+                    //   width: 60,
+                    //   height: 50,
+                    //   fit: BoxFit.cover,
+                    //   imageUrl: userId == message.idFrom ? profilUser : profilPeer,
+                    //   progressIndicatorBuilder: (context, url, downloadProgress) => 
+                    //     SpinKitWave(
+                    //       color: Colors.white,
+                    //       size: 20,
+                    //     ),
+                    //   errorWidget: (context, url, error) => Container(
+                    //     decoration: BoxDecoration(
+                    //       shape: BoxShape.circle,
+                    //       image: DecorationImage(
+                    //         image: AssetImage('assets/img/img_not_available.jpeg'),
+                    //         fit: BoxFit.cover,
+                    //       ),
+                    //     ),
+                    //     clipBehavior: Clip.hardEdge,
+                    //   ),
+                    // ),
                   ),
                 ],
               ),
@@ -129,10 +155,10 @@ class MessageItem extends StatelessWidget {
         alignment: Alignment.centerLeft,
         margin: userId != message.idFrom
             ? const EdgeInsets.only(
-                right: 25,
+                right: 35,
               )
             : const EdgeInsets.only(
-                left: 20,
+                left: 30,
               ),
         padding: const EdgeInsets.all(15),
         decoration: userId != message.idFrom 

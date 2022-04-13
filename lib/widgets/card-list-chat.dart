@@ -34,34 +34,35 @@ class CardListChat extends StatelessWidget {
     print("the function works!");
   }
 
-  // String mes = 'effectivement je suis entrainn';
+  String mes = 'effectivement je suis entrainn de';
   @override
   Widget build(BuildContext context) {
     return Container(
-        width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height * 0.15,
-        child: Card(
-            elevation: 0.6,
-            child: Container(
-              padding: EdgeInsets.all(5.0),
-              child: Row(
-                children: [
-                  GestureDetector(
-                    onTap: tap,
-                    child: Material(
-                      color: Colors.white,
-                      // type: MaterialType.circle,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(20.0))),
+      padding: EdgeInsets.only(left: 5.0, top: 5.0, right: 5.0),
+      margin: EdgeInsets.only(left: 10.0, bottom: 10.0, right: 10.0),
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height * 0.125,
+      child: Column(
+        children: [
+          Container(
+            height: MediaQuery.of(context).size.height * 0.10,
+            padding: EdgeInsets.only(bottom: 5.0),
+            child: Row(
+              children: [
+                GestureDetector(
+                  onTap: tap,
+                  child: Container(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.all(Radius.circular(25)),
                       child: CachedNetworkImage(
                         width: MediaQuery.of(context).size.width * 0.15,
-                        height: MediaQuery.of(context).size.height * 0.10,
+                        height: MediaQuery.of(context).size.height * 0.7,
                         fit: BoxFit.cover,
                         imageUrl: picture,
                         progressIndicatorBuilder: (context, url, downloadProgress) => 
                           SpinKitWave(
                             color: Colors.white,
-                            size: 20,
+                            size: 15,
                           ),
                         errorWidget: (context, url, error) => Container(
                           decoration: BoxDecoration(
@@ -76,62 +77,64 @@ class CardListChat extends StatelessWidget {
                       ),
                     ),
                   ),
-                  GestureDetector(
-                    onTap: onMessage,
-                    child: Container(
-                      width: MediaQuery.of(context).size.width * 0.75,
-                      padding: EdgeInsets.only(left: 5.0, top: 10),
-                      child: Column(
-                        children: [
-                          Container(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  name,
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 15,
-                                  ),
+                ),
+                GestureDetector(
+                  onTap: onMessage,
+                  child: Container(
+                    width: MediaQuery.of(context).size.width * 0.75,
+                    padding: EdgeInsets.only(left: 5.0,),
+                    child: Column(
+                      children: [
+                        Container(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                name,
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 15,
                                 ),
-                                date != null
-                                ? Text(
-                                    date != ''
-                                    ? DateFormat('yyyy-mm-dd kk:mm')
-                                              .format(DateTime.fromMillisecondsSinceEpoch(int.parse(date)))
-                                    : '',
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  )
-                                : Container(),
-                              ],
-                            ),
+                              ),
+                              date != null
+                              ? Text(
+                                  date != ''
+                                  ? DateFormat('yyyy-mm-dd kk:mm')
+                                            .format(DateTime.fromMillisecondsSinceEpoch(int.parse(date)))
+                                  : '',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                )
+                              : Container(),
+                            ],
                           ),
-                          Container(
-                            padding: EdgeInsets.only(top: 7.0),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Material(
-                                  child: Row(
-                                    children: [
-                                      if (etat != 4)
-                                        Icon(
-                                          (etat == 0)
-                                              ? Icons.watch
-                                              : (etat == 1)
-                                                  ? Icons.messenger_outline
-                                                  : (etat == 2)
-                                                      ? Icons.messenger_sharp
-                                                      : (etat == 3)
-                                                          ? Icons.message
-                                                          : null,
-                                          color: Colors.blue,
-                                          size: 15,
-                                        ),
+                        ),
+                        Container(
+                          padding: EdgeInsets.only(top: 5.0),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Material(
+                                child: Row(
+                                  children: [
+                                    if (etat != 4)
+                                      Icon(
+                                        (etat == 0)
+                                            ? Icons.watch
+                                            : (etat == 1)
+                                                ? Icons.messenger_outline
+                                                : (etat == 2)
+                                                    ? Icons.messenger_sharp
+                                                    : (etat == 3)
+                                                        ? Icons.message
+                                                        : null,
+                                        color: Colors.blue,
+                                        size: 15,
+                                      ),
+                                    if(recent_msg != '')
                                       Icon(
                                         (unRead != 0)
                                           ? Icons.mark_chat_unread
@@ -139,58 +142,88 @@ class CardListChat extends StatelessWidget {
                                         color: Colors.blue,
                                         size: 20,
                                       ),
-                                      type != null
-                                      ? type == 0
-                                        ? Material(
-                                          child: Text(
-                                            recent_msg != '' 
-                                            ? recent_msg.length >= 31
-                                              ? recent_msg.substring(0, 30) + '...' : recent_msg
-                                            : 'Aucun message',
-                                            style: TextStyle(
-                                              color: Colors.black,
-                                            ),
-                                          ),
-                                        )
-                                        : Material(
-                                            child: Row(
-                                              children: [
-                                                Icon(Icons.mic_sharp),
-                                                Text('Audio'),
-                                              ]
-                                            ),
-                                          )
-                                      : Container(),
-                                    ],
-                                  ),
-                                ),
-                                unRead != 0
-                                    ? Container(
-                                        padding: EdgeInsets.all(5),
-                                        decoration: BoxDecoration(
-                                          color: Colors.green,
-                                          shape: BoxShape.circle,
-                                        ),
+                                    type != null
+                                    ? type == 0
+                                      ? Material(
                                         child: Text(
-                                          unRead.toString(),
+                                          recent_msg != '' 
+                                          ? recent_msg.length >= 31
+                                            ? recent_msg.substring(0, 30) + '...' : recent_msg
+                                          : 'Aucun message',
                                           style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w500,
+                                            color: Colors.black,
                                           ),
                                         ),
                                       )
+                                      : Material(
+                                          child: Row(
+                                            children: [
+                                              Icon(Icons.mic_sharp),
+                                              Text('Audio'),
+                                            ]
+                                          ),
+                                        )
                                     : Container(),
-                              ],
-                            ),
+                                  ],
+                                ),
+                              ),
+                              unRead != 0
+                                  ? Container(
+                                      padding: EdgeInsets.all(5),
+                                      decoration: BoxDecoration(
+                                        color: Colors.green,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Text(
+                                        unRead.toString(),
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    )
+                                  : Container(),
+                            ],
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  )
-                ],
+                  ),
+                )
+              ],
+            ),
+          ),
+          Container(
+            height: 8.0,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(20),
+                bottomRight: Radius.circular(20),
               ),
-            )));
+              color: Colors.blue,
+            ),
+          ),
+        ],
+      ),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.all(Radius.circular(20)),
+        // gradient: LinearGradient(
+        //   begin: Alignment.topCenter,
+        //   end: Alignment.bottomCenter,
+        //   colors: [
+        //     Colors.blueAccent,
+        //     Colors.blueAccent,
+        //   ],
+        // )
+        // color: Colors.accents,
+        // border: Border(
+        //   bottom: BorderSide(
+        //     color: Colors.blueAccent,
+        //   ),
+        // )
+      ),
+    );
   }
 }
 // ListTile(

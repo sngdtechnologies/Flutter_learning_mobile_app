@@ -1,10 +1,12 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:premiere/screens/Loading.dart';
 import 'package:premiere/screens/Serie.dart';
@@ -80,8 +82,6 @@ class _InfoCompteState extends State<InfoCompte> {
           setState(() {
             _imageFile = pickedFile;
           });
-
-          updatePhoto();
         } catch (e) {
           setState(() {
             _pickImageError = e;
@@ -100,92 +100,39 @@ class _InfoCompteState extends State<InfoCompte> {
         return retrieveError;
       }
       if (_imageFile != null) {
-        print(_imageFile.path);
-        if (kIsWeb) {
-          // Why network?
-          // See https://pub.dev/packages/image_picker#getting-ready-for-the-web-platform
-          print('oui');
-          return Container(
-            height: 170.0,
-            width: 160.0,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              image: DecorationImage(
-                image: NetworkImage(
-                   _imageFile.path
-                ),
-                fit: BoxFit.cover,
-                onError: (dynamic, stackTrace) {
-                  return Container(
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      image: DecorationImage(
-                        image: AssetImage('assets/img/img_not_available.jpeg'),
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    clipBehavior: Clip.hardEdge,
-                  );
-                },
-              ),
-            ),
-          );
-        } else {
-          print('non');
-          return Container(
-            height: 170.0,
-            width: 160.0,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              image: DecorationImage(
-                image: NetworkImage(
-                   user.photoURL
-                ),
-                fit: BoxFit.cover,
-                onError: (dynamic, stackTrace) {
-                  return Container(
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      image: DecorationImage(
-                        image: AssetImage('assets/img/img_not_available.jpeg'),
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    clipBehavior: Clip.hardEdge,
-                  );
-                },
-              ),
-            ),
-          );
-        }
-      } else if (_pickImageError != null) {
-        return Text(
-          'Erreur de selection de l\'image: $_pickImageError',
-          textAlign: TextAlign.center,
+        print('non');
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(80.0),
+          child: Image.file(File(_imageFile.path),
+              height: 170.0,
+              width: 160.0,
+              scale: 3.0,),
         );
       } else {
+        print(user.photoURL);
         return Container(
-          height: 170.0,
-          width: 160.0,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            image: DecorationImage(
-              image: NetworkImage(
-                  user.photoURL
-              ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.all(Radius.circular(55)),
+            child: CachedNetworkImage(
+              width: MediaQuery.of(context).size.width * 0.35,
+              height: MediaQuery.of(context).size.height * 0.25,
               fit: BoxFit.cover,
-              onError: (dynamic, stackTrace) {
-                return Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    image: DecorationImage(
-                      image: AssetImage('assets/img/img_not_available.jpeg'),
-                      fit: BoxFit.cover,
-                    ),
+              imageUrl: user.photoURL,
+              progressIndicatorBuilder: (context, url, downloadProgress) => 
+                SpinKitWave(
+                  color: Colors.white,
+                  size: 15,
+                ),
+              errorWidget: (context, url, error) => Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  image: DecorationImage(
+                    image: AssetImage('assets/img/img_not_available.jpeg'),
+                    fit: BoxFit.cover,
                   ),
-                  clipBehavior: Clip.hardEdge,
-                );
-              },
+                ),
+                clipBehavior: Clip.hardEdge,
+              ),
             ),
           ),
         );
@@ -274,28 +221,55 @@ class _InfoCompteState extends State<InfoCompte> {
                         onTap: () => showDialog(
                           context: context,
                           builder: (context) => Container(
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              image: DecorationImage(
-                                image: NetworkImage(
-                                  user.photoURL
-                                ),
+                            alignment: Alignment.center,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(20),
+                              child: CachedNetworkImage(
+                                width: MediaQuery.of(context).size.width * 0.8,
+                                height: MediaQuery.of(context).size.height * 0.75,
                                 fit: BoxFit.cover,
-                                onError: (dynamic, stackTrace) {
-                                  return Container(
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      image: DecorationImage(
-                                        image: AssetImage('assets/img/img_not_available.jpeg'),
-                                        fit: BoxFit.cover,
-                                      ),
+                                imageUrl: user.photoURL,
+                                progressIndicatorBuilder: (context, url, downloadProgress) => 
+                                        SpinKitWave(
+                                          color: Colors.white,
+                                          size: 20,
+                                        ),
+                                errorWidget: (context, url, error) => Container(
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    image: DecorationImage(
+                                      image: AssetImage('assets/img/img_not_available.jpeg'),
+                                      fit: BoxFit.cover,
                                     ),
-                                    clipBehavior: Clip.hardEdge,
-                                  );
-                                },
+                                  ),
+                                  clipBehavior: Clip.hardEdge,
+                                ),
                               ),
                             ),
                           ),
+                          // builder: (context) => Container(
+                          //   decoration: BoxDecoration(
+                          //     shape: BoxShape.circle,
+                          //     image: DecorationImage(
+                          //       image: NetworkImage(
+                          //         user.photoURL
+                          //       ),
+                          //       fit: BoxFit.cover,
+                          //       onError: (dynamic, stackTrace) {
+                          //         return Container(
+                          //           decoration: BoxDecoration(
+                          //             shape: BoxShape.circle,
+                          //             image: DecorationImage(
+                          //               image: AssetImage('assets/img/img_not_available.jpeg'),
+                          //               fit: BoxFit.cover,
+                          //             ),
+                          //           ),
+                          //           clipBehavior: Clip.hardEdge,
+                          //         );
+                          //       },
+                          //     ),
+                          //   ),
+                          // ),
                         ),
                         child: _previewImage(),
                       ))
@@ -583,21 +557,15 @@ class _InfoCompteState extends State<InfoCompte> {
                                 try {
                                   final result = await InternetAddress.lookup(
                                       'google.com');
-                                  if (result.isNotEmpty &&
-                                      result[0].rawAddress.isNotEmpty) {
-                                    if (user.uid == null) {
+                                  if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+                                    var firebaseUser =  FirebaseAuth.instance.currentUser;
+                                    var result = await _firebaseFirestore.collection("utilisateurs").doc(firebaseUser.uid).get();
+                                        
+                                    if (!result.exists) {
                                       uploadFile(_imageFile);
                                     } else {
                                       updateFile(_imageFile);
-
-                                      // print(nomPrenom)
                                     }
-                                    Navigator.pushAndRemoveUntil(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (BuildContext context) =>
-                                                Serie()),
-                                        ModalRoute.withName('/serie'));
                                   }
                                 } on SocketException catch (_) {
                                   affiche('Veuillez-vous connecter . . .',
@@ -715,6 +683,7 @@ class _InfoCompteState extends State<InfoCompte> {
   }
 
   Future updateFile(PickedFile file) async {
+    print('oui');
     try{
       if(file == null) {
         user.updateProfile(
@@ -723,7 +692,7 @@ class _InfoCompteState extends State<InfoCompte> {
         doc = user.uid;
 
         //Modification du document
-        _firebaseFirestore
+        await _firebaseFirestore
             .collection("utilisateurs")
             .doc(doc)
             .update({
@@ -733,7 +702,14 @@ class _InfoCompteState extends State<InfoCompte> {
           "dateUpdate": DateTime.now(),
         }).then((value) {
           user.reload();
-        });
+          Navigator.push(context,
+              MaterialPageRoute(
+                  builder:
+                      (BuildContext
+                          context) {
+            return Serie();
+          }));
+        }, onError: affiche('Veuillezz recommencer', Icons.error));
       } else {
         String fileName = DateTime.now().millisecondsSinceEpoch.toString() + ".jpeg";
         Reference reference = FirebaseStorage.instance.ref('users').child(user.uid).child('profil').child(fileName);
@@ -753,7 +729,7 @@ class _InfoCompteState extends State<InfoCompte> {
         doc = user.uid;
 
         //Modification du document
-        _firebaseFirestore
+        await _firebaseFirestore
             .collection("utilisateurs")
             .doc(doc)
             .update({
@@ -763,7 +739,14 @@ class _InfoCompteState extends State<InfoCompte> {
           "dateUpdate": DateTime.now(),
         }).then((value) {
           user.reload();
-        });
+          Navigator.push(context,
+              MaterialPageRoute(
+                  builder:
+                      (BuildContext
+                          context) {
+            return Serie();
+          }));
+        }, onError: affiche('Veuillez recommencer', Icons.error));
       }
     
       setState(() {

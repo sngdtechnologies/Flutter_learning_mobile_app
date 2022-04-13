@@ -232,54 +232,66 @@ class _ChatPageState extends State<ChatPage> {
     });
 
     return Scaffold(
-      backgroundColor: dBlue,
-      appBar: AppBar(
-        title: Column(
-          children: [
-            Text(
-              '${namePeer}',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
+      // backgroundColor: dBlue,
+      // appBar: AppBar(
+      //   title: Column(
+      //     children: [
+      //       Text(
+      //         '${namePeer}',
+      //         style: TextStyle(
+      //           color: Colors.white,
+      //           fontSize: 15,
+      //           fontWeight: FontWeight.w600,
+      //         ),
+      //         textAlign: TextAlign.left,
+      //       ),
+      //       Text(
+      //         "Connectée il y a 56s",
+      //         style: TextStyle(
+      //           color: Colors.white,
+      //           fontSize: 13,
+      //           fontWeight: FontWeight.w500,
+      //         ),
+      //         textAlign: TextAlign.left,
+      //       ),
+      //     ],),
+      //   elevation: 0,
+      //   backgroundColor: dBlue,
+      //   leading: IconButton(
+      //     icon: const Icon(
+      //       Icons.arrow_back_ios,
+      //       color: Colors.white,
+      //       size: 23,
+      //     ),
+      //     onPressed: () {
+      //       Navigator.pop(context);
+      //     },
+      //   ),
+      //   actions: [
+      //     IconButton(
+      //       icon: const Icon(
+      //         Icons.more_vert,
+      //         color: Colors.white,
+      //         size: 23,
+      //       ),
+      //       onPressed: () {},
+      //     ),
+      //   ],
+      // ),
+      drawer: ArgonDrawer(currentPage: "Chat"),
+      body: Stack(
+        children: [
+          Container(
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/img/wallpapers1.jpg'),
+                fit: BoxFit.fill,
               ),
-              textAlign: TextAlign.left,
             ),
-            Text(
-              "Connectée il y a 56s",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-              ),
-              textAlign: TextAlign.left,
-            ),
-          ],),
-        elevation: 0,
-        backgroundColor: dBlue,
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios,
-            color: Colors.white,
-            size: 23,
           ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(
-              Icons.more_vert,
-              color: Colors.white,
-              size: 23,
-            ),
-            onPressed: () {},
-          ),
+          _chatingSection(),
         ],
       ),
-      drawer: ArgonDrawer(currentPage: "Chat"),
-      body: _chatingSection(),
     );
   }
 
@@ -288,7 +300,6 @@ class _ChatPageState extends State<ChatPage> {
       padding: const EdgeInsets.symmetric(horizontal: 15),
       height: double.infinity,
       decoration: const BoxDecoration(
-        color: Color(0xAA34322f),
         borderRadius: BorderRadius.only(
           topRight: Radius.circular(40),
           topLeft: Radius.circular(40),
@@ -296,6 +307,51 @@ class _ChatPageState extends State<ChatPage> {
       ),
       child: Column(
         children: [
+          AppBar(
+            title: Column(
+              children: [
+                Text(
+                  '${namePeer}',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  textAlign: TextAlign.left,
+                ),
+                Text(
+                  "Connectée il y a 56s",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  textAlign: TextAlign.left,
+                ),
+              ],),
+            elevation: 0,
+            backgroundColor: Colors.transparent,
+            leading: IconButton(
+              icon: const Icon(
+                Icons.arrow_back_ios,
+                color: Colors.white,
+                size: 23,
+              ),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+            actions: [
+              IconButton(
+                icon: const Icon(
+                  Icons.more_vert,
+                  color: Colors.white,
+                  size: 23,
+                ),
+                onPressed: () {},
+              ),
+            ],
+          ),
           buildListMessage(),
           _bottomSection(),
           isLoading ? Loading() : Container()

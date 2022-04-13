@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:premiere/models/chat_params.dart';
 import 'package:provider/provider.dart';
 import 'package:premiere/models/user.dart';
 import 'package:premiere/services/message_database.dart';
@@ -92,14 +93,61 @@ class DatabaseService {
     // return Stream<String>.value('Coucou');
     List<Map<String, dynamic>> listUser = [];
     Map<String, dynamic> _appUserData;
+
+    // String groupChatId = ChatParams(FirebaseAuth.instance.currentUser.uid, peer).getChatGroupId();
+    // var doc = await FirebaseFirestore.instance
+    //     .collection('messages')
+    //     .doc(groupChatId)
+    //     .collection(groupChatId).get();
+    // if(doc.docs.length > 0)
+    //   setState(() {
+    //     _listmsg.add(doc.docs.last.data());
+    //     // print(doc.docs.last.data());
+    //   });
+    // else 
+    //   setState(() {
+    //     _listmsg.add(lastMessage);
+    //   });
     
     _firebaseFirestore.collection("utilisateurs").get().then((querySnapshot) {
-      querySnapshot.docs.forEach((result) {
-        print(result.id);
+      querySnapshot.docs.forEach((result) async {
+        // print(result.id);
+        String groupChatId = ChatParams(FirebaseAuth.instance.currentUser.uid, result.id).getChatGroupId();
+        var val, val2;
+        var doc = await FirebaseFirestore.instance
+          .collection('messages')
+          .doc(groupChatId)
+          .collection(groupChatId).get();
+
+          
+          if(doc.docs.isNotEmpty)
+            val = doc.docs.last.data();
+          else
+            val = {
+              'content': '',
+              'timestamp': '',
+              'type': 0,
+            };
+
+        var doc2 = await FirebaseFirestore.instance
+            .collection('messages')
+            .doc(groupChatId)
+            .collection(groupChatId)
+            .where('read', isEqualTo: false)
+            .where('idTo', isEqualTo: FirebaseAuth.instance.currentUser.uid)
+            .get();
+
+        if(doc2.docs.isNotEmpty)
+          val2 = doc2.docs.length;
+        else 
+          val2 = 0;
+
         _appUserData = {
           'uid': result.id,
           'nom': result.data()["nom"],
           'profil': result.data()["profil"],
+          'lastMessage': val,
+          'unRead': val2,
         };
         listUser.add(_appUserData);
       });
