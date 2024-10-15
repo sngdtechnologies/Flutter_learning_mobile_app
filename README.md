@@ -1,3 +1,3 @@
-# premiere
+# Learning Mobile app
 
-Un Nouveau projet Flutter
+Offers courses, tutorials and exercises for a fee
